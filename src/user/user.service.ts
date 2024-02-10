@@ -43,6 +43,7 @@ export class UserService {
 
   buildUserResponse(userEntity: UserEntity): UserResponseType {
     return {
+      _id:userEntity._id,
       username: userEntity.username,
       email: userEntity.email,
       token: this.generateJwt(userEntity)

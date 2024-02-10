@@ -3,6 +3,9 @@ import {hash} from "bcrypt";
 
 @Schema()
 export class UserEntity {
+
+  @Prop()
+  _id: string  
   
   @Prop()
   email: string

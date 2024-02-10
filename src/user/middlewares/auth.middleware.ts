@@ -18,10 +18,13 @@ export class AuthMiddleware implements NestMiddleware {
   constructor(private userService: UserService) {}
 
   async use(req: ExpressRequest, res: Response, next: NextFunction) {
-    if (!req.headers['authorization']) {
+
+
+
+    if (!req.headers['authorization']&&!excludedRoutes.includes(req.url)) {
       req.user = null
-      next()
-      return
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
     }
 
     
