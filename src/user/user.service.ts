@@ -21,7 +21,6 @@ export class UserService {
 
     const createdUser = new this.userModel(createUserDto)
       createdUser.save()
-
       return createdUser
   }
 
@@ -43,6 +42,7 @@ export class UserService {
 
   buildUserResponse(userEntity: UserEntity): UserResponseType {
     return {
+      id:userEntity.id,
       _id:userEntity._id,
       username: userEntity.username,
       email: userEntity.email,

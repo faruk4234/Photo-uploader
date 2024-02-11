@@ -21,12 +21,14 @@ export class AuthMiddleware implements NestMiddleware {
 
 
 
-    if (!req.headers['authorization']&&!excludedRoutes.includes(req.url)) {
+    if (!req.headers['authorization']) {
       req.user = null
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-
+      if(!excludedRoutes.includes(req.url)){
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+      next()
+      return
     }
-
     
     
     const token = req.headers['authorization'].split(' ')[1]

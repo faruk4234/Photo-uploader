@@ -5,16 +5,13 @@ import { UserEntity } from "src/user/user.entity";
 export class UploadPhotoDto {
 
   @IsNotEmpty()
+  readonly tags: Array<string>;
+
   readonly name:string
 
   readonly path:string
 
-  readonly body:{
-    tags: Array<string>;
-    is_public:boolean;
-    height?:number;
-    width?:number
-  }
+  readonly is_public?:boolean=true
 
   readonly user:UserEntity
 
