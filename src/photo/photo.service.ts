@@ -90,17 +90,13 @@ export class PhotoService {
 
     async getUserPhoto(photo_id:string,user_id:string): Promise<PhotosEntity> {
       const photo = await this.photoModel.findOne({_id:photo_id});
-      if(!photo){
+      if(!photo)
         throw new HttpException('photo not found', HttpStatus.NOT_FOUND);
-      }
       else {
         if(photo.user_id===user_id)
-        {
           return photo;
-        }
-        else {
+        else 
           throw new HttpException('You are not authanticate', HttpStatus.FORBIDDEN);
-        }
       }
     }
 
