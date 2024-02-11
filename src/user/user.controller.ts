@@ -27,6 +27,7 @@ export class UserController {
 
   @Get()
   async currentUser(@Request() request: ExpressRequest): Promise<UserRegisterResponseType> {
+
     if (!request.user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
     }

@@ -106,7 +106,7 @@ export class PhotoService {
         user_id:photoEntity.user_id,
         tags:photoEntity.tags,
         is_public:photoEntity.is_public,
-        photo_url:'http://localhost:3001'+ photoEntity.photo_url,
+        photo_url:process.env.BASE_URL+ photoEntity.photo_url,
         filename:photoEntity.photo_name,
         upload_date:photoEntity.upload_date,
       }

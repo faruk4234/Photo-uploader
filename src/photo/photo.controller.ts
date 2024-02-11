@@ -15,12 +15,12 @@ export class PhotoController {
 
     constructor(private readonly photoService: PhotoService) {}
 
-  @Post('upload')
+  @Post('/upload')
   @UseInterceptors(
     FileInterceptor('photos', {
       storage: diskStorage({
         destination: './uploads/photos',
-        filename: (req, file, cb) => {
+        filename: (_, file, cb) => {
           const randomName = Array(32)
             .fill(null)
             .map(() => Math.round(Math.random() * 16).toString(16))
@@ -43,18 +43,6 @@ export class PhotoController {
 
     return uploadedFile;
   }
-
-    @Post('/photos')
-    async getPhotos(
-        @Request() request:ExpressRequest,
-        @Response() response,
-        ) {
-        try {
-            return response.json(request.user);
-        } catch (error) {
-            return response.status(500).json({ message: 'Internal server error' });
-        }
-    }
 
     @Get('/my-photos')
     async getMyPhotos(

@@ -2,10 +2,12 @@ import {MiddlewareConsumer, Module, RequestMethod} from '@nestjs/common';
 import {UserModule} from './user/user.module';
 import {MongooseModule} from '@nestjs/mongoose';
 import {AuthMiddleware} from './user/middlewares/auth.middleware';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     UserModule, 
+    ConfigModule.forRoot(),
     MongooseModule.forRoot('mongodb+srv://bonican90:bonbon42@faruk.8x8t5js.mongodb.net/?retryWrites=true'),
   ],
   controllers: [],

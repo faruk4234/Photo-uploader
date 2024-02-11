@@ -1,5 +1,6 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {hash} from "bcrypt";
+import { IsNotEmpty } from "class-validator";
 
 @Schema()
 export class UserEntity {
@@ -14,7 +15,8 @@ export class UserEntity {
   @Prop()
   username: string
 
-  @Prop({select: false})
+
+  @Prop({select: false,min:6,max:12})
   password: string
 }
 

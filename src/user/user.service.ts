@@ -64,7 +64,7 @@ export class UserService {
   }
 
   generateJwt(userEntity: UserEntity): string {
-    return sign({email: userEntity.email}, 'JWT_SECRET')
+    return sign({email: userEntity.email}, process.env.JWT_SECRET)
   }
 
   async findByEmail(email: string): Promise<UserEntity> {
