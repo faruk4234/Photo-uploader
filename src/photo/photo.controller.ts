@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post ,Put,Query,Request, Response, UploadedFile, UploadedFiles, UseGuards, UseInterceptors} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post ,Put,Query,Request, Response, UploadedFile, UploadedFiles, UseGuards, UseInterceptors} from '@nestjs/common';
 import { PhotoService } from './photo.service';
 import { AuthMiddleware, ExpressRequest } from 'src/user/middlewares/auth.middleware';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,6 +25,10 @@ export class PhotoController {
             .fill(null)
             .map(() => Math.round(Math.random() * 16).toString(16))
             .join('');
+
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+                return cb(new BadRequestException('Only image files are allowed!'), false);
+              }
           return cb(null, `${randomName}${extname(file.originalname)}`);
         },
       }),
