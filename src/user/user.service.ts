@@ -12,7 +12,7 @@ import {sign} from 'jsonwebtoken';
 export class UserService {
   constructor(@InjectModel(UserEntity.name) private userModel: Model<UserEntity>) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<any> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = await this.userModel.findOne({email: createUserDto.email})
 
     if (user) {

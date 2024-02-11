@@ -14,6 +14,7 @@ export class PhotoService {
 
     async uploadPhoto(uploadPhotoDto: UploadPhotoDto): Promise<photeResponseType> {
 
+      //resize photo adding wattermark and save
       const watermarkResized = await sharp('src/assets/tgoku.png')
       .resize({ 
         width:Number(uploadPhotoDto.body.width||400),
@@ -42,6 +43,7 @@ export class PhotoService {
         tags:uploadPhotoDto.body.tags
       });
 
+      //deleting old orginal photo
       fs.unlinkSync('uploads/photos/'+ uploadPhotoDto.path)
 
       createdPhoto.save();
@@ -88,6 +90,7 @@ export class PhotoService {
        return true
     }
 
+    //authanticate user for update or deleting 
     async getUserPhoto(photo_id:string,user_id:string): Promise<PhotosEntity> {
       const photo = await this.photoModel.findOne({_id:photo_id});
       if(!photo)
@@ -100,6 +103,7 @@ export class PhotoService {
       }
     }
 
+     
     buildPhotoResponse(photoEntity: PhotosEntity): photeResponseType {
       return {
         id:photoEntity._id,

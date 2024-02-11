@@ -19,8 +19,7 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: ExpressRequest, res: Response, next: NextFunction) {
 
-
-
+    //if you have not token and not register or login then exception will work
     if (!req.headers['authorization']) {
       req.user = null
       if(!excludedRoutes.includes(req.url)){
@@ -32,7 +31,7 @@ export class AuthMiddleware implements NestMiddleware {
     
     
     const token = req.headers['authorization'].split(' ')[1]
-
+    //token verify 
     try {
       const decode = verify(token, process.env.JWT_SECRET) as {email: string}
       const user = await this.userService.findByEmail(decode.email)

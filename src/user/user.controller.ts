@@ -25,6 +25,7 @@ export class UserController {
     return this.userService.buildLoginResponse(user)
   }
 
+  //get user current name and email
   @Get()
   async currentUser(@Request() request: ExpressRequest): Promise<UserRegisterResponseType> {
 
