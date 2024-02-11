@@ -3,7 +3,6 @@ import { UploadPhotoDto } from './dto/uploadPhoto.dto';
 import { PhotosEntity } from './photo.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import * as sharp from 'sharp';
 import * as fs from 'fs';
 import { updatePhotoSettingsDto } from './dto/updatePhotoSettings.dto';
 import { photeResponseType } from './types/photoResponse.type';
@@ -14,46 +13,17 @@ export class PhotoService {
     @InjectModel(PhotosEntity.name) private photoModel: Model<PhotosEntity>,
   ) {}
 
-  async uploadPhoto(file) {
-    return {
-      url: file.transforms[0].location,
-    };
-  }
-
-  async uploadPhoto2(
+  async uploadPhoto(
+    file,
     uploadPhotoDto: UploadPhotoDto,
   ): Promise<photeResponseType> {
-    //resize photo adding wattermark and save
-    const watermarkResized = await sharp('src/assets/tgoku.png')
-      .resize({
-        width: Number(uploadPhotoDto.body.width || 400),
-        height: Number(uploadPhotoDto.body.height || 700),
-      })
-      .toBuffer();
-
-    await sharp(`uploads/photos/${uploadPhotoDto.path}`)
-      .resize({
-        width: Number(uploadPhotoDto.body.width || 400),
-        height: Number(uploadPhotoDto.body.height || 700),
-      })
-      .composite([
-        {
-          input: watermarkResized,
-          gravity: 'southeast',
-        },
-      ])
-      .toFile(`uploads/photos/1${uploadPhotoDto.path}`);
-
     const createdPhoto = new this.photoModel({
       photo_name: uploadPhotoDto.name,
-      photo_url: `/uploads/photos/1` + uploadPhotoDto.path,
+      photo_url: file.transforms[0].location,
       is_public: uploadPhotoDto.body.is_public || true,
       user_id: uploadPhotoDto.user.id,
       tags: uploadPhotoDto.body.tags,
     });
-
-    //deleting old orginal photo
-    fs.unlinkSync('uploads/photos/' + uploadPhotoDto.path);
 
     createdPhoto.save();
 
@@ -135,7 +105,7 @@ export class PhotoService {
       user_id: photoEntity.user_id,
       tags: photoEntity.tags,
       is_public: photoEntity.is_public,
-      photo_url: process.env.BASE_URL + photoEntity.photo_url,
+      photo_url: photoEntity.photo_url,
       filename: photoEntity.photo_name,
       upload_date: photoEntity.upload_date,
     };

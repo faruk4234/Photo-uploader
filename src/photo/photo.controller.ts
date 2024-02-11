@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,33 +10,25 @@ import {
   Request,
   Response,
   UploadedFile,
-  UploadedFiles,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { PhotoService } from './photo.service';
-import {
-  AuthMiddleware,
-  ExpressRequest,
-} from 'src/user/middlewares/auth.middleware';
+import { ExpressRequest } from 'src/user/middlewares/auth.middleware';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { UploadPhotoDto } from './dto/uploadPhoto.dto';
-import * as sharp from 'sharp';
-import * as fs from 'fs';
 import { updatePhotoSettingsDto } from './dto/updatePhotoSettings.dto';
 
 @Controller('photo')
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
-  @UseInterceptors(FileInterceptor('photos'))
+  @UseInterceptors(FileInterceptor('photo'))
   @Post('upload')
-  uploadPhoto(@UploadedFile() photos) {
-    return this.photoService.uploadPhoto(photos);
+  uploadPhoto(@UploadedFile() photo, @Request() req: UploadPhotoDto) {
+    return this.photoService.uploadPhoto(photo, req);
   }
 
+  //get only current user photos
   @Get('/my-photos')
   async getMyPhotos(
     @Request() request: ExpressRequest,
@@ -55,12 +46,14 @@ export class PhotoController {
     }
   }
 
+  //get all pubic photos
   @Get('/photos')
   async getPhoto(@Response() response, @Query('search') searchTerm?: string) {
     const result = await this.photoService.getAllPhotos(searchTerm);
     return response.json(result);
   }
 
+  //update taggs and public state
   @Put()
   async updatePhoto(
     @Request() { user }: ExpressRequest,
@@ -76,6 +69,7 @@ export class PhotoController {
     return response.json(result);
   }
 
+  //delete photo
   @Delete('/:id')
   async deleteMyPhoto(
     @Request() { user }: ExpressRequest,

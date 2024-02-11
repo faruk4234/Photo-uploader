@@ -9,6 +9,7 @@ import * as aws from 'aws-sdk';
 import * as multerS3 from 'multer-s3-transform';
 import * as sharp from 'sharp';
 import { v4 } from 'uuid';
+import { UploadPhotoDto } from './dto/uploadPhoto.dto';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { v4 } from 'uuid';
             bucket: 'faruk-photo-upload',
             acl: 'public-read',
             contentType: multerS3.AUTO_CONTENT_TYPE,
-            metadata(req, file, cb) {
+            async metadata(req, file, cb) {
               cb(null, { fieldName: file.fieldname });
             },
             shouldTransform: true,
@@ -40,8 +41,29 @@ import { v4 } from 'uuid';
                 key(req, file, cb) {
                   cb(null, `${v4()}.jpeg`);
                 },
-                transform(req, file, cb) {
-                  cb(null, sharp().jpeg());
+                async transform(req, file, cb) {
+                  const watermarkBuffer = await sharp('src/assets/tgoku.png')
+                    .resize({
+                      width: Number(req.body.width || 400),
+                      height: Number(req.body.height || 700),
+                    })
+                    .toBuffer();
+
+                  cb(
+                    null,
+                    sharp()
+                      .resize({
+                        width: Number(req.body.width || 400),
+                        height: Number(req.body.height || 700),
+                      })
+                      .composite([
+                        {
+                          input: watermarkBuffer,
+                          gravity: 'southeast',
+                        },
+                      ])
+                      .jpeg(),
+                  );
                 },
               },
             ],
