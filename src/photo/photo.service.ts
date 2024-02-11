@@ -10,110 +10,134 @@ import { photeResponseType } from './types/photoResponse.type';
 
 @Injectable()
 export class PhotoService {
-    constructor(@InjectModel(PhotosEntity.name) private photoModel: Model<PhotosEntity>) {}
+  constructor(
+    @InjectModel(PhotosEntity.name) private photoModel: Model<PhotosEntity>,
+  ) {}
 
-    async uploadPhoto(uploadPhotoDto: UploadPhotoDto): Promise<photeResponseType> {
+  async uploadPhoto(file) {
+    return {
+      url: file.transforms[0].location,
+    };
+  }
 
-      //resize photo adding wattermark and save
-      const watermarkResized = await sharp('src/assets/tgoku.png')
-      .resize({ 
-        width:Number(uploadPhotoDto.body.width||400),
-        height:Number(uploadPhotoDto.body.height||700) 
-      }) 
+  async uploadPhoto2(
+    uploadPhotoDto: UploadPhotoDto,
+  ): Promise<photeResponseType> {
+    //resize photo adding wattermark and save
+    const watermarkResized = await sharp('src/assets/tgoku.png')
+      .resize({
+        width: Number(uploadPhotoDto.body.width || 400),
+        height: Number(uploadPhotoDto.body.height || 700),
+      })
       .toBuffer();
 
-      await sharp(`uploads/photos/${uploadPhotoDto.path}`)
+    await sharp(`uploads/photos/${uploadPhotoDto.path}`)
       .resize({
-         width: Number(uploadPhotoDto.body.width||400),
-         height:Number(uploadPhotoDto.body.height||700)
-       })
-       .composite([
+        width: Number(uploadPhotoDto.body.width || 400),
+        height: Number(uploadPhotoDto.body.height || 700),
+      })
+      .composite([
         {
-          input:watermarkResized,
-          gravity: 'southeast' 
-        }
+          input: watermarkResized,
+          gravity: 'southeast',
+        },
       ])
       .toFile(`uploads/photos/1${uploadPhotoDto.path}`);
 
-        const createdPhoto = new this.photoModel({
-        photo_name:uploadPhotoDto.name,
-        photo_url:`/uploads/photos/1`+uploadPhotoDto.path,
-        is_public:uploadPhotoDto.body.is_public||true,
-        user_id: uploadPhotoDto.user.id,
-        tags:uploadPhotoDto.body.tags
-      });
+    const createdPhoto = new this.photoModel({
+      photo_name: uploadPhotoDto.name,
+      photo_url: `/uploads/photos/1` + uploadPhotoDto.path,
+      is_public: uploadPhotoDto.body.is_public || true,
+      user_id: uploadPhotoDto.user.id,
+      tags: uploadPhotoDto.body.tags,
+    });
 
-      //deleting old orginal photo
-      fs.unlinkSync('uploads/photos/'+ uploadPhotoDto.path)
+    //deleting old orginal photo
+    fs.unlinkSync('uploads/photos/' + uploadPhotoDto.path);
 
-      createdPhoto.save();
+    createdPhoto.save();
 
-      return this.buildPhotoResponse(createdPhoto)
+    return this.buildPhotoResponse(createdPhoto);
+  }
+
+  async getUserAllPhotos(
+    user_id: string,
+    searchTerm?: string,
+  ): Promise<photeResponseType[]> {
+    let photos: PhotosEntity[];
+    if (searchTerm) {
+      photos = await this.photoModel
+        .find({ user_id, tags: { $in: [new RegExp(searchTerm, 'i')] } })
+        .exec();
+    } else {
+      photos = await this.photoModel.find({ user_id }).exec();
     }
+    return photos.map((photo) => this.buildPhotoResponse(photo));
+  }
 
-    async getUserAllPhotos(user_id:string,searchTerm?:string): Promise<photeResponseType[]> {
-      let photos: PhotosEntity[];
-      if (searchTerm) {
-        photos = await this.photoModel.find({ user_id, tags: { $in: [new RegExp(searchTerm, 'i')] } }).exec();
-      } else {
-        photos = await this.photoModel.find({ user_id }).exec();
-      }
-      return photos.map((photo)=>this.buildPhotoResponse(photo));
+  async getAllPhotos(searchTerm?: string): Promise<photeResponseType[]> {
+    let photos: PhotosEntity[];
+    if (searchTerm) {
+      photos = await this.photoModel
+        .find({ is_public: true, tags: { $in: [new RegExp(searchTerm, 'i')] } })
+        .exec();
+    } else {
+      photos = await this.photoModel.find({ is_public: true }).exec();
     }
+    return photos.map((photo) => this.buildPhotoResponse(photo));
+  }
 
-    async getAllPhotos(searchTerm?:string): Promise<photeResponseType[]> {
-      let photos: PhotosEntity[];
-      if (searchTerm) {
-        photos = await this.photoModel.find({ is_public:true, tags: { $in: [new RegExp(searchTerm, 'i')] } }).exec();
-      } else {
-        photos = await this.photoModel.find({ is_public:true }).exec();
-      }
-      return photos.map((photo)=>this.buildPhotoResponse(photo));
-    }
-
-    async updateUserPhotoSettings(user_id:string,photo_id:string,updateDto:updatePhotoSettingsDto): Promise<photeResponseType> {
-      const photo = await this.getUserPhoto(photo_id,user_id)
-      const updatedPhoto=await this.photoModel.findByIdAndUpdate(photo._id, {
-        $set: { ...updateDto} },
+  async updateUserPhotoSettings(
+    user_id: string,
+    photo_id: string,
+    updateDto: updatePhotoSettingsDto,
+  ): Promise<photeResponseType> {
+    const photo = await this.getUserPhoto(photo_id, user_id);
+    const updatedPhoto = await this.photoModel.findByIdAndUpdate(
+      photo._id,
+      {
+        $set: { ...updateDto },
+      },
       {
         new: true,
-      })
-      return this.buildPhotoResponse(updatedPhoto)
-    }
+      },
+    );
+    return this.buildPhotoResponse(updatedPhoto);
+  }
 
-    async deleteUserPhoto(photo_id:string,user_id:string,): Promise<boolean> {
-      const photo = await this.getUserPhoto(photo_id,user_id)
-      if (fs.existsSync(photo.photo_url)) {
-        fs.unlinkSync(photo.photo_url);
-       }
-       await this.photoModel.deleteOne({_id:photo._id})
-       return true
+  async deleteUserPhoto(photo_id: string, user_id: string): Promise<boolean> {
+    const photo = await this.getUserPhoto(photo_id, user_id);
+    if (fs.existsSync(photo.photo_url)) {
+      fs.unlinkSync(photo.photo_url);
     }
+    await this.photoModel.deleteOne({ _id: photo._id });
+    return true;
+  }
 
-    //authanticate user for update or deleting 
-    async getUserPhoto(photo_id:string,user_id:string): Promise<PhotosEntity> {
-      const photo = await this.photoModel.findOne({_id:photo_id});
-      if(!photo)
-        throw new HttpException('photo not found', HttpStatus.NOT_FOUND);
-      else {
-        if(photo.user_id===user_id)
-          return photo;
-        else 
-          throw new HttpException('You are not authanticate', HttpStatus.FORBIDDEN);
-      }
+  //authanticate user for update or deleting
+  async getUserPhoto(photo_id: string, user_id: string): Promise<PhotosEntity> {
+    const photo = await this.photoModel.findOne({ _id: photo_id });
+    if (!photo)
+      throw new HttpException('photo not found', HttpStatus.NOT_FOUND);
+    else {
+      if (photo.user_id === user_id) return photo;
+      else
+        throw new HttpException(
+          'You are not authanticate',
+          HttpStatus.FORBIDDEN,
+        );
     }
+  }
 
-     
-    buildPhotoResponse(photoEntity: PhotosEntity): photeResponseType {
-      return {
-        id:photoEntity._id,
-        user_id:photoEntity.user_id,
-        tags:photoEntity.tags,
-        is_public:photoEntity.is_public,
-        photo_url:process.env.BASE_URL+ photoEntity.photo_url,
-        filename:photoEntity.photo_name,
-        upload_date:photoEntity.upload_date,
-      }
-    }
-    
+  buildPhotoResponse(photoEntity: PhotosEntity): photeResponseType {
+    return {
+      id: photoEntity._id,
+      user_id: photoEntity.user_id,
+      tags: photoEntity.tags,
+      is_public: photoEntity.is_public,
+      photo_url: process.env.BASE_URL + photoEntity.photo_url,
+      filename: photoEntity.photo_name,
+      upload_date: photoEntity.upload_date,
+    };
+  }
 }
