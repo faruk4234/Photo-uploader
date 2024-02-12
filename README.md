@@ -1,3 +1,19 @@
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+</p>
+
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
+
+
+
+## Description
+
+Briefly, it's an API service where users can register and upload photos. While uploading photos, users can resize them and add tags. These tags enable search functionality within the service. If you make the photo public, anyone can access it. If you make it private, only you can edit or delete your own photos.
+
+In this project, I tried to use exceptions correctly while using S3 for photo storage and many other things for the first time. It's my first time using Nest.js, and it's only been 2 days since I started. During this process, I learned Nest.js, set up Docker and AWS for the first time, and used them for installation.
+
+# Don't bother because the API service is already running live.
 ## Build server
 ```bash
 # dowload and build server
