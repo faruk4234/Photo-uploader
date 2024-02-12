@@ -64,7 +64,6 @@ response example (auth)
 
 <br/><br/>
 <br/><br/>
-<br/><br/>
 
 #### POST /user/register
 request example (no auth)
@@ -87,11 +86,8 @@ response examples
 }
 ```
 
-
-
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### POST /user/login
 request body example (no auth)
@@ -112,10 +108,8 @@ response examples
 }
 ```
 
-
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### POST /photo/upload
 request body example (auth)
@@ -144,10 +138,8 @@ response examples
 }
 ```
 
-
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### PUT /photo?:photo_id(required)
 request body example (auth)
@@ -187,9 +179,8 @@ response examples
 }
 ```
 
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### DELETE /photo/:photo_id(required)
 response examples
@@ -211,14 +202,8 @@ response examples
 }
 ```
 
-
-
-
-
-
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### GET /photo/my-photos?:search
 response examples
@@ -256,9 +241,8 @@ you can use search param for tag filter
 },
 ```
 
-
-
-
+<br/><br/>
+<br/><br/>
 
 #### GET /photo/photos?:search
 response examples
