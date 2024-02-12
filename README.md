@@ -49,6 +49,10 @@ published url = http://photo-env.eba-vpc2zdvj.eu-central-1.elasticbeanstalk.com/
  ```
 
 
+
+
+
+
 #### GET /user
 response example (auth)
  ```bash
@@ -57,6 +61,11 @@ response example (auth)
     "email": "deneme1@gmail.com"
 }
 ```
+
+
+
+
+
 
 
 
@@ -81,6 +90,12 @@ response examples
 }
 ```
 
+
+
+
+
+
+
 #### POST /user/login
 request body example (no auth)
  ```bash
@@ -99,6 +114,11 @@ response examples
     "message": "User not found"
 }
 ```
+
+
+
+
+
 
 #### POST /photo/upload
 request body example (auth)
@@ -126,6 +146,11 @@ response examples
     "message": "Internal server error"
 }
 ```
+
+
+
+
+
 
 #### PUT /photo?:photo_id(required)
 request body example (auth)
@@ -165,6 +190,10 @@ response examples
 }
 ```
 
+
+
+
+
 #### DELETE /photo/:photo_id(required)
 response examples
  ```bash
@@ -184,6 +213,15 @@ response examples
     "message": "photo not found" //if photo doesnt exist
 }
 ```
+
+
+
+
+
+
+
+
+
 
 #### GET /photo/my-photos?:search
 response examples
@@ -220,6 +258,9 @@ you can use search param for tag filter
     "message": "Unauthorized"
 },
 ```
+
+
+
 
 
 #### GET /photo/photos?:search
