@@ -62,12 +62,9 @@ response example (auth)
 }
 ```
 
-
-
-
-
-
-
+<br/><br/>
+<br/><br/>
+<br/><br/>
 
 #### POST /user/register
 request example (no auth)
